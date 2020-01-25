@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="https://cdn.anychart.com/releases/v8/css/anychart-ui.min.css">
+	<link rel="stylesheet" href="https://cdn.anychart.com/releases/v8/fonts/css/anychart-font.min.css">
+	<script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+	<script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>
+	<script src="https://cdn.anychart.com/releases/v8/js/anychart-ui.min.js"></script>
+	<script src="https://cdn.anychart.com/releases/v8/locales/en-us.js"></script>
+</head>
+<body>
+	<div id="container" style="width: 850px; height: 600px; margin: 0 auto;"></div>
+	<script>
+		anychart.onDocumentReady(function () {
+
+		var format ="EEEE, dd MMMM yyyy";
+		var locale = "en-us";
+
+		anychart.format.outputLocale("en-us");
+		anychart.format.outputDateTimeFormat("EEEE, dd MMMM yyyy");
+
+		var timeZoneOffset = new Date().getTimezoneOffset();
+
+		var data = [
+            ['2015-01', 22, 43, 75],
+            ['2015-02', 34, 45, 56],
+            ['2015-03', 16, 26, 67],
+            ['2015-04', 12, 86, 42],
+            ['2015-05', 41, 35, 17],
+            ['2015-06', 47, 31, 12],
+            ['2015-07', 39, 27, 9],
+            ['2015-08', 28, 16, 23],
+            ['2015-09', 21, 27, 47],
+            ['2015-10', 18, 31, 58],
+            ['2015-11', 24, 42, 69],
+            ['2015-12', 29, 39, 71]
+        ];
+
+        var title = 'ACME corp. Problems During the Year\n' + 'From: ' +
+            anychart.format.dateTime(data[0][0], format, timeZoneOffset, locale) +
+            '\nTo: ' + anychart.format.dateTime(data[data.length - 1][0], format, timeZoneOffset, locale);
+
+        // create data set on our data, also we can put data directly to series
+        var dataSet = anychart.data.set(data);
+
+        // map data for the first series,take value from first column of data set
+        var seriesData_1 = dataSet.mapAs({'x': 0, 'value': 1});
+
+        // map data for the second series,take value from second column of data set
+        var seriesData_2 = dataSet.mapAs({'x': 0, 'value': 2});
+
+        // map data for the third series, take x from the zero column and value from the third column of data set
+        var seriesData_3 = dataSet.mapAs({'x': 0, 'value': 3});
+
+        // create line chart
+        var chart = anychart.line();
+        // turn on the crosshair and tune it
+        chart.crosshair()
+            .enabled(true)
+            .yLabel(false)
+            .xLabel(false)
+            .yStroke(null);
+
+        // set chart title text settings
+        chart.title(title);
+        // set chart padding
+        chart.padding().top(10);
+        // set yAxis title
+        chart.yAxis().title('Occurences per month');
+
+        /** Helper Function to setup series
+         *  @param series - stroke color
+         *  @param name - stroke series name
+         */
+        var seriesConfiguration = function (series, name) {
+            series.name(name);
+            series.hovered().markers()
+                .enabled(true)
+                .size(4);
+        };
+
+        // temp variable to store series instance
+        var series;
+
+        // setup first series
+        series = chart.line(seriesData_1);
+        series.stroke('#7CC0F7');
+        seriesConfiguration(series, 'Purchase Returns');
+
+        // setup second series
+        series = chart.line(seriesData_2);
+        series.stroke('#3C8AD8');
+        seriesConfiguration(series, 'Delivery Failure');
+
+        // setup third series
+        series = chart.line(seriesData_3);
+        series.stroke('#F18126');
+        seriesConfiguration(series, 'Order Cancellation');
+
+        // turn the legend on
+        chart.legend().enabled(true).padding([0, 0, 10, 0]);
+
+        chart.xAxis().labels().format(function () {
+            return anychart.format.dateTime(this.value, 'MMM', timeZoneOffset, locale);
+        });
+        chart.tooltip().titleFormat(function () {
+            return anychart.format.dateTime(this.points[0].x, format, timeZoneOffset, locale);
+        });
+
+        chart.tooltip().displayMode('union');
+
+        // set container id for the chart
+        chart.container('container');
+        // initiate chart drawing
+        chart.draw();
+		});
+	</script>
+</body>
+</html>
